@@ -8,9 +8,9 @@ module.exports =
 			title: 'Kotlin compiler executable'
 			default: 'kotlinc'
 		classpath:
-				type: 'string'
-				title: 'Extra classpath to kotlinc'
-				default: ''
+			type: 'string'
+			title: 'Extra classpath to kotlinc'
+			default: ''
 		compilerOutputDir:
 			type: 'string'
 			title: 'Compiler output directory'
@@ -37,7 +37,7 @@ module.exports =
 		@provider = new LinterKotlin()
 		return {
 			name: 'Kotlin'
-			grammarScopes: ['source.Kotlin']
+			grammarScopes: ['source.kotlin']
 			scope: 'project' # or 'file'
 			lintOnFly: false # must be false for scope: 'project'
 			lint: @provider.lint
