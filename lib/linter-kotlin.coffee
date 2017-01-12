@@ -5,7 +5,7 @@ cpConfigFileName = '.atom_jvm_classpath'
 
 
 class LinterKotlin
-	errorPattern: /^(\w+\.kt):(\d*):(\d*):\s(error|warning):\s(.*)$/
+	errorPattern: /^(.*\.kt):(\d*):(\d*):\s(error|warning):\s(.*)$/
 
 	lint: (textEditor) =>
 		helpers = require 'atom-linter'
