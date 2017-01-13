@@ -50,14 +50,29 @@ class LinterKotlin
 		lines.push.apply(lines, kotlincOutput.stdout.split(/\r?\n/))
 		msgs = []
 
+		projectRoot = @getProjectRootDir(textEditor)
+
 		for line in lines
-			if line.match @errorPattern
-				[file, lineNum, lineCol, msgType, msg] = line.match(@errorPattern)[1..5]
-				msgs.push
-					type: msgType
-					text: msg
-					range: [[lineNum - 1, lineCol - 1], [lineNum - 1, lineCol]]
-					filePath: file
+			if !line.match @errorPattern
+				continue
+
+			[file, lineNum, lineCol, msgType, msg] = line.match(@errorPattern)[1..5]
+
+			msgType = switch msgType.toLowerCase()
+				when "warning" then "Warning"
+				when "error" then "Error"
+				else "Warning"
+
+			line = parseInt(lineNum, 10)
+			col = parseInt(lineCol, 10)
+			fileAbsolutePath = path.resolve(projectRoot, file)
+
+			msgs.push
+				type: msgType
+				text: msg
+				range: [[line - 1, col - 1], [line - 1, col]]
+				filePath: fileAbsolutePath
+
 		return msgs
 
 	getFilesEndingWith: (startPath, endsWith) =>
