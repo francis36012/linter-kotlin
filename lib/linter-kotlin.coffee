@@ -11,7 +11,7 @@ class LinterKotlin
 		helpers = require 'atom-linter'
 		filePath = textEditor.getPath()
 
-		projRootDir = @getProjectRootDir()
+		projRootDir = @getProjectRootDir(textEditor)
 		cpConfig = @findClasspathConfig(projRootDir)
 
 		wd = path.dirname filePath
@@ -42,7 +42,7 @@ class LinterKotlin
 			catch error
 
 		command = atom.config.get "linter-kotlin.executablePath"
-		helpers.exec(command, args, {stream: 'both', cwd: wd})
+		helpers.exec(command, args, {stream: 'both', cwd: wd, timeout: 30000})
 			.then (output) => return @parse(output, textEditor)
 
 	parse: (kotlincOutput, textEditor) =>
@@ -56,22 +56,24 @@ class LinterKotlin
 			if !line.match @errorPattern
 				continue
 
-			[file, lineNum, lineCol, msgType, msg] = line.match(@errorPattern)[1..5]
+			[file, lineNum, lineCol, severity, msg] = line.match(@errorPattern)[1..5]
 
-			msgType = switch msgType.toLowerCase()
-				when "warning" then "Warning"
-				when "error" then "Error"
-				else "Warning"
+			severity = switch severity.toLowerCase()
+				when "warning" then "warning"
+				when "error" then "error"
+				when "info" then "info"
+				else "info"
 
 			line = parseInt(lineNum, 10)
 			col = parseInt(lineCol, 10)
 			fileAbsolutePath = path.resolve(projectRoot, file)
 
 			msgs.push
-				type: msgType
-				text: msg
-				range: [[line - 1, col - 1], [line - 1, col]]
-				filePath: fileAbsolutePath
+				severity: severity
+				excerpt: msg
+				location:
+					position: [[line - 1, col - 1], [line - 1, col]]
+					file: fileAbsolutePath
 
 		return msgs
 
@@ -91,15 +93,10 @@ class LinterKotlin
 		catch
 			return []
 
-	# from linter-javac
 	getProjectRootDir: (textEditor) =>
-		textEditor = atom.workspace.getActiveTextEditor()
-		if !textEditor or !textEditor.getPath()
-			# default to building the first one if no editor is active
-			if (0 == atom.project.getPaths().length)
-				return false
-
-			return atom.project.getPaths()[0]
+		projectDir = atom.project.relativizePath(textEditor.getPath())[0]
+		if projectDir
+			return projectDir
 
 		# otherwise, build the one in the root of the active editor
 		return atom.project.getPaths().sort((a, b) => (b.length - a.length)).find (p) =>

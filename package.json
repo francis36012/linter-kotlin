@@ -11,11 +11,11 @@
   ],
   "license": "MIT",
   "engines": {
-    "atom": ">=1.0.0 <2.0.0"
+    "atom": ">=2.0.0 <3.0.0"
   },
   "dependencies": {
-    "atom-package-deps": "^4.0.1",
-    "atom-linter": "^8.0.0"
+    "atom-package-deps": "^4.6.0",
+    "atom-linter": "^10.0.0"
   },
   "package-deps": [
     "linter",
@@ -24,7 +24,7 @@
   "providedServices": {
     "linter": {
       "versions": {
-        "1.0.0": "provideLinter"
+        "2.0.0": "provideLinter"
       }
     }
   }

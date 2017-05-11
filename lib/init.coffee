@@ -38,7 +38,8 @@ module.exports =
 		return {
 			name: 'Kotlin'
 			grammarScopes: ['source.kotlin']
-			scope: 'project' # or 'file'
-			lintOnFly: false # must be false for scope: 'project'
+			scope: 'project'
+			lintOnFly: false
+			lintsOnChange: false
 			lint: @provider.lint
 		}
