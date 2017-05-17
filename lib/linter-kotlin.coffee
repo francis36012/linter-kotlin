@@ -9,22 +9,31 @@ class LinterKotlin
 
 	lint: (textEditor) =>
 		helpers = require 'atom-linter'
-		filePath = textEditor.getPath()
 
 		projRootDir = @getProjectRootDir(textEditor)
+
+		if not projRootDir?
+			# single file without a project directory, do nothing
+			return []
+
 		cpConfig = @findClasspathConfig(projRootDir)
 
-		wd = path.dirname filePath
+		wd = projRootDir
 		cp = null
 		files = @getFilesEndingWith(projRootDir, '.kt')
 
 		if cpConfig?
-			wd = cpConfig.cfgDir
 			cp = cpConfig.cfgCp
-			files = @getFilesEndingWith(wd, ".kt")
 
-		cp += path.delimeter + @classpath if @classpath
-		cp += path.delimeter + process.env.CLASSPATH if process.env.CLASSPATH
+		cp =  if @classpath
+			if cp? then "#{cp}#{path.delimeter}#{@classpath}" else @classpath
+		else
+			cp
+
+		cp = if process.env.CLASSPATH
+			if cp? then "#{cp}#{path.delimeter}#{process.env.CLASSPATH}" else process.env.CLASSPATH
+		else
+			cp
 
 		args = []
 		args = args.concat(['-cp', cp]) if cp?
@@ -32,6 +41,7 @@ class LinterKotlin
 
 		coutdir = atom.config.get "linter-kotlin.compilerOutputDir"
 		outputdir = path.join projRootDir, coutdir
+
 		try
 			fs.lstatSync outputdir
 			args.push.apply(args, ['-d', outputdir])
@@ -43,14 +53,12 @@ class LinterKotlin
 
 		command = atom.config.get "linter-kotlin.executablePath"
 		helpers.exec(command, args, {stream: 'both', cwd: wd, timeout: 30000})
-			.then (output) => return @parse(output, textEditor)
+			.then (output) => return @parse(output, textEditor, projRootDir)
 
-	parse: (kotlincOutput, textEditor) =>
+	parse: (kotlincOutput, textEditor, projectRoot) =>
 		lines = kotlincOutput.stderr.split(/\r?\n/)
 		lines.push.apply(lines, kotlincOutput.stdout.split(/\r?\n/))
 		msgs = []
-
-		projectRoot = @getProjectRootDir(textEditor)
 
 		for line in lines
 			if !line.match @errorPattern
@@ -67,6 +75,7 @@ class LinterKotlin
 			line = parseInt(lineNum, 10)
 			col = parseInt(lineCol, 10)
 			fileAbsolutePath = path.resolve(projectRoot, file)
+
 
 			msgs.push
 				severity: severity
@@ -98,10 +107,12 @@ class LinterKotlin
 		if projectDir
 			return projectDir
 
-		# otherwise, build the one in the root of the active editor
-		return atom.project.getPaths().sort((a, b) => (b.length - a.length)).find (p) =>
-			realpath = fs.realpathSync(p)
-			return textEditor.getPath().substr(0, realpath.length) == realpath
+		return atom.project.getPaths()
+			.sort((a, b) => (b.length - a.length))
+			.find((p) =>
+				realpath = fs.realpathSync(p)
+				return textEditor.getPath().substr(0, realpath.length) == realpath
+			)
 
 	findClasspathConfig: (d) ->
 		while atom.project.contains(d) or (d in atom.project.getPaths())
