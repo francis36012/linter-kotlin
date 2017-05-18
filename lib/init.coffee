@@ -15,6 +15,10 @@ module.exports =
 			type: 'string'
 			title: 'Compiler output directory'
 			default: 'bin'
+		commandTimeout:
+			type: 'number'
+			title: 'Number of seconds to wait for compilation completion'
+			default: 30
 
 	activate: ->
 		require('atom-package-deps').install()
@@ -28,6 +32,9 @@ module.exports =
 
 		@subscriptions.add atom.config.observe 'linter-kotlin.compilerOutputDir',
 			(newCoutDir) => @compilerOutputDir = newCoutDir
+
+		@subscriptions.add atom.config.observe 'linter-kotlin.commandTimeout',
+			(newCommandTimeout) => @commandTimeout = newCommandTimeout
 
 	deactivate: ->
 		@subscriptions.dispose()

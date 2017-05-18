@@ -20,6 +20,8 @@ Available configuration options are:
 *default: ''*
 - `compilerOutputDir` - The directory to put generated class files  
 *default: 'bin'*
+- `commandTimeout` - Number of seconds to wait for the compiler
+*default: 30*
 
 An example configuration (in config.cson):
 ```cson
@@ -27,6 +29,7 @@ An example configuration (in config.cson):
 	executablePath: "/usr/bin/kotlinc"
 	classpath: "/usr/local/lib/java/somelibrary.jar:/home/user/classdir"
 	compilerOutputDir: "build"
+	commandTimeout: 30
 ```
 
 Project specific classpath can be defined in a file called `.atom_jvm_classpath`  

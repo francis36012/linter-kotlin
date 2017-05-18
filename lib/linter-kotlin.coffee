@@ -52,7 +52,10 @@ class LinterKotlin
 			catch error
 
 		command = atom.config.get "linter-kotlin.executablePath"
-		helpers.exec(command, args, {stream: 'both', cwd: wd, timeout: 30000})
+		timeout = atom.config.get("linter-kotlin.commandTimeout") * 1000
+		timeout = 30000 if timeout <= 0
+
+		helpers.exec(command, args, {stream: 'both', cwd: wd, timeout: timeout})
 			.then (output) => return @parse(output, textEditor, projRootDir)
 
 	parse: (kotlincOutput, textEditor, projectRoot) =>
