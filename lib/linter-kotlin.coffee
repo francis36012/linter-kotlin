@@ -26,12 +26,12 @@ class LinterKotlin
 			cp = cpConfig.cfgCp
 
 		cp =  if @classpath
-			if cp? then "#{cp}#{path.delimeter}#{@classpath}" else @classpath
+			if cp? then "#{cp}#{path.delimiter}#{@classpath}" else @classpath
 		else
 			cp
 
 		cp = if process.env.CLASSPATH
-			if cp? then "#{cp}#{path.delimeter}#{process.env.CLASSPATH}" else process.env.CLASSPATH
+			if cp? then "#{cp}#{path.delimiter}#{process.env.CLASSPATH}" else process.env.CLASSPATH
 		else
 			cp
 
