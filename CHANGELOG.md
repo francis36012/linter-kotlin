@@ -8,3 +8,6 @@ Take care to get the correct absolute path for a file. Fixes [issue #2](https://
 
 ## 0.5
 Add option for command timeout
+
+## 0.5.1
+Fix incorrect call to `path.delimiter`
