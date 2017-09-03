@@ -1,7 +1,7 @@
 {
   "name": "linter-kotlin",
   "main": "./lib/init",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A linter for the kotlin language using kotlinc",
   "repository": "https://github.com/francis36012/linter-kotlin",
   "keywords": [
