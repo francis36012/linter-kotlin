@@ -5,7 +5,7 @@ cpConfigFileName = '.atom_jvm_classpath'
 
 
 class LinterKotlin
-	errorPattern: /^(.*\.kt):(\d*):(\d*):\s(error|warning):\s(.*)$/
+	errorPattern: /^(.*\.kt|.*\.kts):(\d*):(\d*):\s(error|warning):\s(.*)$/
 
 	lint: (textEditor) =>
 		helpers = require 'atom-linter'
@@ -20,7 +20,7 @@ class LinterKotlin
 
 		wd = projRootDir
 		cp = null
-		files = @getFilesEndingWith(projRootDir, '.kt')
+		files = @getFilesEndingWith(projRootDir, ['.kt','.kts'])
 
 		if cpConfig?
 			cp = cpConfig.cfgCp
@@ -99,8 +99,10 @@ class LinterKotlin
 				stat = fs.lstatSync filename
 				if stat.isDirectory()
 					foundFiles.push.apply(foundFiles, @getFilesEndingWith(filename, endsWith))
-				else if filename.indexOf(endsWith, filename.length - (endsWith.length)) > 0
-					foundFiles.push.apply(foundFiles, [filename])
+				else
+					for extension in endsWith
+						if filename.indexOf(extension, filename.length - (extension.length)) > 0
+							foundFiles.push.apply(foundFiles, [filename])
 			return foundFiles
 		catch
 			return []
