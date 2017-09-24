@@ -11,3 +11,6 @@ Add option for command timeout
 
 ## 0.5.1
 Fix incorrect call to `path.delimiter`
+
+## 0.6
+Add support checking `.kts` files
